@@ -1,0 +1,44 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Conversation {
+  id        Int        @id @default(autoincrement())
+  messages  Message[]
+  uploads   Upload[]   // Define the relation
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Message {
+  id             Int           @id @default(autoincrement())
+  conversation   Conversation  @relation(fields: [conversationId], references: [id])
+  conversationId Int
+  sender         Sender
+  content        String
+  createdAt      DateTime      @default(now())
+}
+
+model Upload {
+  id            Int        @id @default(autoincrement())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId Int
+  fileName      String
+  filePath      String
+  originalName  String
+  mimeType      String
+  size          Int
+  createdAt     DateTime   @default(now())
+}
+
+enum Sender {
+  USER
+  BOT
+}
